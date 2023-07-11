@@ -23,6 +23,14 @@
               ${mlton} -output $output tests.mlb && $output
             '');
           };
+
+          build = {
+            type = "app";
+            program = toString (pkgs.writeShellScript "build-program" ''
+              output=$(${mktemp})
+              ${mlton} -output $output smltest.mlb && echo "Successfully built!"
+            '');
+          };
         });
 
       devShells = forAllSystems (system:
