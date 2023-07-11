@@ -33,7 +33,7 @@
           default = devenv.lib.mkShell {
             inherit inputs pkgs;
             modules = [{
-              packages = with pkgs; [ millet mlton mlkit smlfmt gnumake ];
+              packages = with pkgs; [ millet mlton mlkit smlfmt gnumake polyml gcc ];
             }];
           };
         });

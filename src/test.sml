@@ -1,5 +1,7 @@
 signature TEST =
 sig
+  structure Expectation : EXPECTATION
+
   (* I didn't want to expose this, but we need this datatype on the runner *)
   datatype Test =
     UnitTest of (unit -> Expectation.Expectation)
@@ -16,8 +18,6 @@ sig
   val ftest: string -> (unit -> Expectation.Expectation) -> Test
   val stest: string -> (unit -> Expectation.Expectation) -> Test
 
-  val testTheory: string -> 'a list -> Test
-
   val skip: Test -> Test
   val focus: Test -> Test
   val concat: Test list -> Test
@@ -25,8 +25,11 @@ end
 
 structure Test: TEST =
 struct
+  structure Expectation = Expectation
+  open Expectation
+
   datatype Test =
-    UnitTest of (unit -> Expectation.Expectation)
+    UnitTest of (unit -> Expectation)
   | Labeled of (string * Test)
   | Skipped of Test
   | Focused of Test
@@ -46,7 +49,10 @@ struct
 
   fun concat tests =
     if List.length tests = 0 then
-      UnitTest (fn _ => Expectation.Fail)
-    else (* TODO: validate duplicated names *)
+      UnitTest (fn _ =>
+        fail { description = "This `concat` list is empty."
+             , reason = Invalid EmptyList })
+    else
+      (* TODO: validate duplicated names *)
       Batch tests
 end

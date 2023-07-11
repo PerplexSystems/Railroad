@@ -41,7 +41,6 @@ struct
   fun fromRunnableTree labels runner =
     case runner of
       Runnable runnable => [{ labels = labels, run = fn () => runThunk runnable }]
-
     | Labeled (label, subRunner) => fromRunnableTree (label :: labels) subRunner
 
   fun distributeSeeds hashed seed test =
@@ -97,10 +96,23 @@ struct
           , skipped = (#all next) }
         end
 
+  fun countAllRunnables trees =
+    let
+      fun countRunnables runnable =
+        case runnable of
+          Runnable _ => 1
+        | Labeled (_, runner) => countRunnables runner
+    in
+      List.foldl 
+        (fn (runnable, acc) => 
+          (countRunnables runnable) + acc)
+        0
+        trees
+    end
+
   fun runWithOptions opts test =
     let
-      (* TODO DO THE WHOLE DANCE WITH FOCUSED AND SKIPPED *)
-      val { all, ... } = distributeSeeds false 0 test
+      val { all, focused, skipped, ... } = distributeSeeds false 0 test
     in
       (* I do miss the pipe operator *)
       List.app (fn rt =>
