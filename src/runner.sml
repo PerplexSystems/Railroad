@@ -126,6 +126,7 @@ struct
             |> concatMap (fromRunnableTree [])
       end
 
+  (* perharps this should return 0 and 1 so we can fail on CI *)
   fun runwithoptions opts test =
     let
       val seededRunners = fromTest 42 test
