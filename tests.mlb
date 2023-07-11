@@ -1,3 +1,10 @@
 $(SML_LIB)/basis/basis.mlb
-smltest.mlb
+src/expectation.sml
+src/internal.sml
+src/runner.sml
+src/test.sml
+src/expect.sml
+
+tests/expect.sml
+tests/runner.sml
 tests/main.sml

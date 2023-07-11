@@ -1,20 +1,13 @@
 (* TODO *)
-type RunResult = unit
 
-signature RUNNER =
-sig
-  datatype RunnerOption =
-      Seed of int
-    | Sequenced
-
-  val runWithOptions: RunnerOption list -> Test.Test -> RunResult
-  val run: Test.Test -> RunResult
-end
-
-structure Runner: RUNNER =
+structure Runner  =
 struct
+  infix  3 |>     fun x |> f = f x
+
   open Expectation
-  open Test
+  structure Test = INTERNAL_TEST
+
+  type RunResult = unit
 
   datatype RunnerOption =
     Sequenced
@@ -36,14 +29,20 @@ struct
     , focused: RunnableTree list
     , skipped: RunnableTree list }
 
+  datatype SeededRunners
+    = Plain of Runner list
+    | Focused of Runner list
+    | Skipping of Runner list
+    | Invalid of string
+
   fun runThunk (Thunk thunk) = thunk ()
 
   fun fromRunnableTree labels runner =
     case runner of
       Runnable runnable => [{ labels = labels, run = fn () => runThunk runnable }]
-    | Labeled (label, subRunner) => fromRunnableTree (label :: labels) subRunner
+    | Labeled (label, subRunner) => fromRunnableTree (labels @ [ label ]) subRunner
 
-  fun distributeSeeds hashed seed test =
+  fun distributeSeeds seed test =
     case test of
       Test.UnitTest code =>
         { seed = seed
@@ -53,7 +52,7 @@ struct
 
     | Test.Labeled (description, subTest) =>
         let
-          val next = distributeSeeds hashed seed subTest
+          val next = distributeSeeds seed subTest
           val labelTests = (fn tests => Labeled (description, tests))
         in
           { seed = (#seed next)
@@ -66,7 +65,7 @@ struct
         List.foldl
           (fn (test, prev) =>
             let
-              val next = distributeSeeds hashed seed test
+              val next = distributeSeeds seed test
             in
               { seed = (#seed next)
               , all = (#all prev) @ (#all next)
@@ -78,7 +77,7 @@ struct
 
     | Test.Focused test =>
         let
-          val next = distributeSeeds hashed seed test
+          val next = distributeSeeds seed test
         in
           { seed = (#seed next)
           , all = []
@@ -88,7 +87,7 @@ struct
 
     | Test.Skipped test =>
         let
-          val next = distributeSeeds hashed seed test
+          val next = distributeSeeds seed test
         in
           { seed = (#seed next)
           , all = []
@@ -103,27 +102,46 @@ struct
           Runnable _ => 1
         | Labeled (_, runner) => countRunnables runner
     in
-      List.foldl 
-        (fn (runnable, acc) => 
+      List.foldl
+        (fn (runnable, acc) =>
           (countRunnables runnable) + acc)
         0
         trees
     end
 
-  fun runWithOptions opts test =
+  fun concatMap f m = List.concat (List.map (fn x => f x) m)
+
+  fun fromTest seed test =
+      let
+        val distribution = distributeSeeds seed test
+        fun isEmpty l = List.length l = 0
+      in
+        if isEmpty (#focused distribution) then
+          if (countAllRunnables (#skipped distribution)) = 0 then
+            (#all distribution)
+            |> concatMap (fromRunnableTree [])
+          else
+            (#all distribution)
+            |> concatMap (fromRunnableTree [])
+        else
+            (#focused distribution)
+            |> concatMap (fromRunnableTree [])
+      end
+
+  fun runwithoptions opts test =
     let
-      val { all, focused, skipped, ... } = distributeSeeds false 0 test
+      val seededRunners = fromTest 42 test
     in
-      (* I do miss the pipe operator *)
-      List.app (fn rt =>
+      seededRunners
+      |> List.app (fn { run, labels } =>
         let
-          val runners = fromRunnableTree [] rt
+          val label = labels |> String.concatWith "."
+          val (result, description) = Expectation.toString (run ())
         in
-          List.app (fn { run, ... } => (run (); ())) runners
-        end) all
+          (print(result ^ " - " ^ label ^ " " ^ description ^ "\n"))
+        end)
     end
 
   fun run test =
-    runWithOptions [ Seed 123 ] test
-
+    runwithoptions [ Seed 123 ] test
 end
