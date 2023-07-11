@@ -1,6 +1,5 @@
 signature TEST =
 sig
-  (* I didn't want to expose this, but we need this datatype on the runner *)
   val describe: string -> INTERNAL_TEST.Test list -> INTERNAL_TEST.Test
   val test: string -> (unit -> Expectation.Expectation) -> INTERNAL_TEST.Test
   val skip: INTERNAL_TEST.Test -> INTERNAL_TEST.Test
@@ -15,13 +14,10 @@ structure Test: TEST =
 struct
   structure Test = INTERNAL_TEST
   structure Runner = Runner
-
   structure Expectation = Expectation
+
   open Expectation
-
   open Test
-
-  (* | FuzzTest (Random.Seed -> Int -> List Expectation) *)
 
   fun describe description tests = Labeled (description, Batch tests)
   fun test description code = Labeled (description, UnitTest code)

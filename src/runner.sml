@@ -1,5 +1,3 @@
-(* TODO *)
-
 structure Runner  =
 struct
   infix  3 |>     fun x |> f = f x

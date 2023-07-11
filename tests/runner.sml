@@ -28,7 +28,5 @@ val runnerTests =
           Expect.equal actual 1 Int.compare
         end
       )
-
     ]
-
   ]
