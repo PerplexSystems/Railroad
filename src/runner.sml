@@ -1,15 +1,35 @@
+structure RunnerOption = struct
+  type RunnerOption = { sequenced: bool, seed: int option }
+
+  datatype RunnerOption
+    = Seed of int option
+    | Sequenced
+
+  val empty = { seed = NONE, sequenced = false }
+
+  fun build opts =
+    List.foldl (fn (opt, acc) =>
+      case opt of
+        Seed seed =>
+          { seed = seed
+          , sequenced = (#sequenced acc) }
+      | Sequenced =>
+          { seed = (#seed acc)
+          , sequenced = true }
+    ) empty opts
+end
+
 structure Runner  =
 struct
   infix  3 |>     fun x |> f = f x
 
-  open Expectation
   structure Test = INTERNAL_TEST
+  structure RunnerOption = RunnerOption
+
+  open Expectation
+  open RunnerOption
 
   type RunResult = unit
-
-  datatype RunnerOption =
-    Sequenced
-  | Seed of int
 
   type Runner =
     { run: unit -> Expectation
@@ -22,8 +42,7 @@ struct
   | Labeled of (string * RunnableTree)
 
   type Distribution =
-    { seed: int
-    , all: RunnableTree list
+    { all: RunnableTree list
     , focused: RunnableTree list
     , skipped: RunnableTree list }
 
@@ -40,21 +59,19 @@ struct
       Runnable runnable => [{ labels = labels, run = fn () => runThunk runnable }]
     | Labeled (label, subRunner) => fromRunnableTree (labels @ [ label ]) subRunner
 
-  fun distributeSeeds seed test =
+  fun toDistribution test =
     case test of
       Test.UnitTest code =>
-        { seed = seed
-        , all = [Runnable (Thunk (fn _ => code ()))]
+        { all = [Runnable (Thunk (fn _ => code ()))]
         , focused = []
         , skipped = [] }
 
     | Test.Labeled (description, subTest) =>
         let
-          val next = distributeSeeds seed subTest
+          val next = toDistribution subTest
           val labelTests = (fn tests => Labeled (description, tests))
         in
-          { seed = (#seed next)
-          , all = List.map labelTests (#all next)
+          { all = List.map labelTests (#all next)
           , focused = List.map labelTests (#focused next)
           , skipped = List.map labelTests (#skipped next) }
         end
@@ -63,32 +80,29 @@ struct
         List.foldl
           (fn (test, prev) =>
             let
-              val next = distributeSeeds seed test
+              val next = toDistribution test
             in
-              { seed = (#seed next)
-              , all = (#all prev) @ (#all next)
+              { all = (#all prev) @ (#all next)
               , focused = (#focused prev) @ (#focused next)
               , skipped = (#skipped prev) @ (#skipped next) }
             end)
-          { seed = 0, all = [], focused = [], skipped = [] }
+          { all = [], focused = [], skipped = [] }
           subTests
 
     | Test.Focused test =>
         let
-          val next = distributeSeeds seed test
+          val next = toDistribution test
         in
-          { seed = (#seed next)
-          , all = []
+          { all = []
           , focused = (#all next)
           , skipped = [] }
         end
 
     | Test.Skipped test =>
         let
-          val next = distributeSeeds seed test
+          val next = toDistribution test
         in
-          { seed = (#seed next)
-          , all = []
+          { all = []
           , focused = []
           , skipped = (#all next) }
         end
@@ -109,38 +123,40 @@ struct
 
   fun concatMap f m = List.concat (List.map (fn x => f x) m)
 
-  fun fromTest seed test =
-      let
-        val distribution = distributeSeeds seed test
-        fun isEmpty l = List.length l = 0
-      in
-        if isEmpty (#focused distribution) then
-          if (countAllRunnables (#skipped distribution)) = 0 then
-            (#all distribution)
-            |> concatMap (fromRunnableTree [])
-          else
-            (#all distribution)
-            |> concatMap (fromRunnableTree [])
+  fun fromTest test =
+    let
+      val distribution = toDistribution test
+    in
+      if List.null (#focused distribution) then
+        if (countAllRunnables (#skipped distribution)) = 0 then
+          (#all distribution)
+          |> concatMap (fromRunnableTree [])
         else
-            (#focused distribution)
-            |> concatMap (fromRunnableTree [])
-      end
+          (#all distribution)
+          |> concatMap (fromRunnableTree [])
+      else
+          (#focused distribution)
+          |> concatMap (fromRunnableTree [])
+    end
 
   (* perharps this should return 0 and 1 so we can fail on CI *)
-  fun runwithoptions opts test =
+  fun runwithoptions (options: RunnerOption list) test =
     let
-      val seededRunners = fromTest 42 test
+      val runners = fromTest test
+      val opts = RunnerOption.build options
     in
-      seededRunners
+      runners
       |> List.app (fn { run, labels } =>
         let
           val label = labels |> String.concatWith "."
           val (result, description) = Expectation.toString (run ())
         in
           (print(result ^ " - " ^ label ^ " " ^ description ^ "\n"))
-        end)
+        end);
+        (* TODO: should this exit on test failure? *)
+      (OS.Process.exit OS.Process.failure)
     end
 
   fun run test =
-    runwithoptions [ Seed 123 ] test
+    runwithoptions [ ] test
 end

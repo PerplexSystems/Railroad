@@ -8,7 +8,7 @@ val runnerTests =
             Test.describe "single test" [
               Test.test "" (fn _ => Expectation.Pass)
             ]
-          val distribution = Runner.distributeSeeds 0 tests
+          val distribution = Runner.toDistribution tests
           val actual = List.length (#all distribution)
         in
           Expect.equal actual 1 Int.compare
@@ -22,7 +22,7 @@ val runnerTests =
               Test.focus (Test.test "" (fn _ => Expectation.Pass)),
               Test.test "" (fn _ => Expectation.Pass)
             ]
-          val distribution = Runner.distributeSeeds 0 tests
+          val distribution = Runner.toDistribution tests
           val actual = List.length (#focused distribution)
         in
           Expect.equal actual 1 Int.compare
