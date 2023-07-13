@@ -20,7 +20,7 @@
             type = "app";
             program = toString (pkgs.writeShellScript "run-tests" ''
               output=$(${mktemp})
-              ${mlton} -output $output tests.mlb && $output
+              ${mlton} -output $output tests/tests.mlb && $output
             '');
           };
 

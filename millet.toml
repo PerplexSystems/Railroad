@@ -1,2 +1,2 @@
 version = 1
-workspace.root = "smltest.mlb"
+workspace.root = "tests/tests.mlb"

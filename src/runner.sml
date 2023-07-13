@@ -1,33 +1,23 @@
-structure RunnerOption = struct
-  type RunnerOption = { sequenced: bool, seed: int option }
+signature RUNNER = sig
+  type Runner = { run: unit -> Expectation.Expectation, labels: string list }
 
-  datatype RunnerOption
-    = Seed of int option
-    | Sequenced
+  datatype SeededRunners =
+    Plain of Runner list
+  | Focused of Runner list
+  | Skipping of Runner list
+  | Invalid of string
 
-  val empty = { seed = NONE, sequenced = false }
-
-  fun build opts =
-    List.foldl (fn (opt, acc) =>
-      case opt of
-        Seed seed =>
-          { seed = seed
-          , sequenced = (#sequenced acc) }
-      | Sequenced =>
-          { seed = (#seed acc)
-          , sequenced = true }
-    ) empty opts
+  val fromtest: INTERNAL_TEST.Test -> SeededRunners
+  val failurereason: Expectation.Expectation -> Expectation.fail option
 end
 
-structure Runner  =
+structure Runner =
 struct
   infix  3 |>     fun x |> f = f x
 
   structure Test = INTERNAL_TEST
-  structure RunnerOption = RunnerOption
 
   open Expectation
-  open RunnerOption
 
   type RunResult = unit
 
@@ -46,7 +36,12 @@ struct
     , focused: RunnableTree list
     , skipped: RunnableTree list }
 
-  datatype SeededRunners
+  type RunReport =
+    { passed: int
+    , failed: int
+    , skipped: int }
+
+  datatype Runners
     = Plain of Runner list
     | Focused of Runner list
     | Skipping of Runner list
@@ -93,9 +88,9 @@ struct
         let
           val next = toDistribution test
         in
-          { all = []
+          { all = (#all next)
           , focused = (#all next)
-          , skipped = [] }
+          , skipped = (#skipped next) }
         end
 
     | Test.Skipped test =>
@@ -131,32 +126,50 @@ struct
         if (countAllRunnables (#skipped distribution)) = 0 then
           (#all distribution)
           |> concatMap (fromRunnableTree [])
+          |> Plain
         else
           (#all distribution)
           |> concatMap (fromRunnableTree [])
+          |> Skipping
       else
           (#focused distribution)
           |> concatMap (fromRunnableTree [])
+          |> Focused
     end
 
-  (* perharps this should return 0 and 1 so we can fail on CI *)
-  fun runwithoptions (options: RunnerOption list) test =
+  fun runwithoptions (options: unit) test =
+    (*
+      TODO: where to test for duplicate labels ??????
+     *)
     let
       val runners = fromTest test
-      val opts = RunnerOption.build options
-    in
-      runners
-      |> List.app (fn { run, labels } =>
+
+      fun runRunner (runner: Runner) =
         let
-          val label = labels |> String.concatWith "."
-          val (result, description) = Expectation.toString (run ())
+          val label = String.concatWith "." (#labels runner)
+          val result = ((#run runner) ())
         in
-          (print(result ^ " - " ^ label ^ " " ^ description ^ "\n"))
-        end);
-        (* TODO: should this exit on test failure? *)
-      (OS.Process.exit OS.Process.failure)
+          (label, result)
+        end
+
+    in
+      case runners of
+        Plain rs =>
+          let
+            val runs = rs |> List.map runRunner
+          in
+            runs |> List.app (fn (label, _) => (print (label ^ "\n"); ()))
+          end
+
+      | Skipping rs =>
+
+          (OS.Process.exit OS.Process.failure; ())
+      | Focused rs =>
+
+          (OS.Process.exit OS.Process.success; ())
+      | Invalid str => print "invalid"
     end
 
   fun run test =
-    runwithoptions [ ] test
+    runwithoptions () test
 end
