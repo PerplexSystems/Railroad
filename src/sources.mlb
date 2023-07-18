@@ -1,0 +1,11 @@
+local
+    $(SML_LIB)/basis/basis.mlb
+    expectation.sml
+    internal.sml
+    runner.sml
+    test.sml
+    expect.sml
+in
+    structure Test
+    structure Expect
+end
