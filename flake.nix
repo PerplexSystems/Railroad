@@ -37,6 +37,7 @@
         let
           pkgs = nixpkgs.legacyPackages.${system};
           mlton = "${pkgs.mlton}/bin/mlton";
+          mlkit = "${pkgs.mlkit}/bin/mlkit";
           mktemp = "${pkgs.coreutils}/bin/mktemp";
         in {
           test = {
@@ -44,6 +45,9 @@
             program = toString (pkgs.writeShellScript "run-tests" ''
               output=$(${mktemp})
               ${mlton} -output $output tests/tests.mlb && $output
+
+              output=$(${mktemp})
+              ${mlkit} --output $output tests/tests.mlb && $output
             '');
           };
 
@@ -51,7 +55,7 @@
             type = "app";
             program = toString (pkgs.writeShellScript "build-program" ''
               output=$(${mktemp})
-              ${mlton} -output $output sources.mlb && echo "Successfully built!"
+              ${mlton} -output $output src/sources.mlb && echo "Successfully built!"
             '');
           };
         });
@@ -66,7 +70,7 @@
             modules = [{
               packages = with pkgs; [
                 # compilers
-                mlton lunarml
+                mlton mlkit
 
                 # tools
                 millet smlfmt 
