@@ -60,6 +60,7 @@ Check out the table of contents below for more information:
     - [lessfmt](#lessfmt)
     - [greater](#greater)
     - [greaterfmt](#greaterfmt)
+  - [License](#license)
 
 ## Installing
 
@@ -430,3 +431,7 @@ receives a [`tostring`](#tostring) that encapsulates the values on the
 ```sml
 Expect.atmost Int.compare Int.toString 3 4
 ```
+
+## License
+
+[Apache 2.0](https://choosealicense.com/licenses/apache-2.0/)
