@@ -66,7 +66,7 @@
             modules = [{
               packages = with pkgs; [
                 # compilers
-                mlton smlnj
+                mlton lunarml
 
                 # tools
                 millet smlfmt 
