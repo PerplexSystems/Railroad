@@ -37,7 +37,6 @@
         let
           pkgs = nixpkgs.legacyPackages.${system};
           mlton = "${pkgs.mlton}/bin/mlton";
-          mlkit = "${pkgs.mlkit}/bin/mlkit";
           mktemp = "${pkgs.coreutils}/bin/mktemp";
         in {
           test = {
@@ -45,9 +44,6 @@
             program = toString (pkgs.writeShellScript "run-tests" ''
               output=$(${mktemp})
               ${mlton} -output $output tests/tests.mlb && $output
-
-              output=$(${mktemp})
-              ${mlkit} --output $output tests/tests.mlb && $output
             '');
           };
 
@@ -70,7 +66,7 @@
             modules = [{
               packages = with pkgs; [
                 # compilers
-                mlton mlkit
+                mlton
 
                 # tools
                 millet smlfmt

@@ -7,6 +7,7 @@ sig
   val concat: Test list -> Test
 
   val run: Test -> unit
+  val runWithOptions: Runner.RunnerOption list -> Test -> unit
 end
 
 structure Test: TEST =
@@ -70,4 +71,5 @@ struct
           end
 
   fun run test = Runner.run test
+  fun runWithOptions options test = Runner.runWithOptions options test
 end

@@ -16,7 +16,30 @@ structure Runner =
 struct
   open Expectation
 
-  type RunResult = unit
+  datatype RunnerOption =
+    Output of TextIO.outstream
+  | Seed of int option
+  | Sequenced
+
+  type RunnerOptionRecord =
+    {output: TextIO.outstream, seed: int option, sequenced: bool}
+
+  val defaultRunnerOptions = {output = TextIO.stdOut, seed = NONE, sequenced = false}
+
+  fun runnerOptionFromList options =
+    List.foldl
+      (fn (opt, acc) =>
+         case opt of
+           Output value =>
+             {output = value, seed = (#seed acc), sequenced = (#sequenced acc)}
+         | Seed value =>
+             { output = (#output acc)
+             , seed = value
+             , sequenced = (#sequenced acc)
+             }
+         | Sequenced =>
+             {output = (#output acc), seed = (#seed acc), sequenced = true})
+      defaultRunnerOptions options
 
   type Runner = {run: unit -> Expectation, labels: string list}
 
@@ -132,36 +155,40 @@ struct
          else {passed = (#passed acc), failed = (#failed acc) + 1})
       {passed = 0, failed = 0} runs
 
-  fun printreport {passed, failed} =
-    print
-      ("Passed: " ^ Int.toString passed ^ ", failed: " ^ Int.toString failed
+  fun printreport stream {passed, failed} =
+    let
+      val output = ("Passed: " ^ Int.toString passed ^ ", failed: " ^ Int.toString failed
        ^ "\n")
+    in
+      TextIO.output (stream, output)
+    end
 
-  fun runtests runners =
+  fun runtests stream runners =
     let
       val runs = (List.map evalrunner runners)
       val report = runreport runs
     in
-      (List.app (fn {result, ...} => print result) runs; report)
+      (List.app (fn {result, ...} => TextIO.output (stream, result)) runs; report)
     end
 
-  fun runwithoptions (options: unit) test =
+  fun runWithOptions options test =
     let
       val runners = fromtest test
+      val { output, sequenced, seed } = runnerOptionFromList options
     in
       case runners of
         Plain rs =>
           let
-            val report = runtests rs
-            val _ = printreport report
+            val report = runtests output rs
+            val _ = printreport output report
           in
             if (#failed report) > 0 then OS.Process.exit OS.Process.failure
             else OS.Process.exit OS.Process.success
           end
       | Skipping rs =>
           let
-            val report = runtests rs
-            val _ = printreport report
+            val report = runtests output rs
+            val _ = printreport output report
           in
             (* skipping a test should always fail all the tests *)
             OS.Process.exit OS.Process.failure
@@ -169,8 +196,8 @@ struct
 
       | Focusing rs =>
           let
-            val report = runtests rs
-            val _ = printreport report
+            val report = runtests output rs
+            val _ = printreport output report
           in
             (* focusing a test should always fail all the tests *)
             OS.Process.exit OS.Process.failure
@@ -178,5 +205,5 @@ struct
       | Invalid _ => (* TODO *) OS.Process.exit OS.Process.failure
     end
 
-  fun run test = runwithoptions () test
+  fun run test = runWithOptions [] test
 end
