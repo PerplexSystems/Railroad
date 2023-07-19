@@ -24,7 +24,8 @@ struct
   type RunnerOptionRecord =
     {output: TextIO.outstream, seed: int option, sequenced: bool}
 
-  val defaultRunnerOptions = {output = TextIO.stdOut, seed = NONE, sequenced = false}
+  val defaultRunnerOptions =
+    {output = TextIO.stdOut, seed = NONE, sequenced = false}
 
   fun runnerOptionFromList options =
     List.foldl
@@ -157,8 +158,9 @@ struct
 
   fun printreport stream {passed, failed} =
     let
-      val output = ("Passed: " ^ Int.toString passed ^ ", failed: " ^ Int.toString failed
-       ^ "\n")
+      val output =
+        ("Passed: " ^ Int.toString passed ^ ", failed: " ^ Int.toString failed
+         ^ "\n")
     in
       TextIO.output (stream, output)
     end
@@ -168,13 +170,15 @@ struct
       val runs = (List.map evalrunner runners)
       val report = runreport runs
     in
-      (List.app (fn {result, ...} => TextIO.output (stream, result)) runs; report)
+      ( List.app (fn {result, ...} => TextIO.output (stream, result)) runs
+      ; report
+      )
     end
 
   fun runWithOptions options test =
     let
       val runners = fromtest test
-      val { output, sequenced, seed } = runnerOptionFromList options
+      val {output, sequenced, seed} = runnerOptionFromList options
     in
       case runners of
         Plain rs =>
