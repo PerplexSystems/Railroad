@@ -14,10 +14,10 @@ along with a built-in test runner.
 ## Installation
 
 ```sh
-$ git clone https://github.com/PerplexSystems/smltest.git $YOUR_PROJECT/lib/smltest
+$ git clone https://github.com/PerplexSystems/smltest.git $YOUR_PROJECT/vendor/smltest
 ```
 
-Then reference `lib/smltest/sources.mlb` on your project's `.mlb` file. Example:
+Then reference `vendor/smltest/sources.mlb` on your project's `.mlb` file. Example:
 
 ```sml
 $(SML_LIB)/basis/basis.mlb
