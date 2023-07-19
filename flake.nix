@@ -55,7 +55,7 @@
             type = "app";
             program = toString (pkgs.writeShellScript "build-program" ''
               output=$(${mktemp})
-              ${mlton} -output $output src/sources.mlb && echo "Successfully built!"
+              ${mlton} -output $output sources.mlb && echo "Successfully built!"
             '');
           };
         });

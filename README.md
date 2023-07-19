@@ -11,6 +11,20 @@ inspired by [elm-test](https://github.com/elm-explorations/test) and
 This library provides a set of composable functions for writing tests,
 along with a built-in test runner.
 
+## Installation
+
+```sh
+$ git clone https://github.com/PerplexSystems/smltest.git $YOUR_PROJECT/lib/smltest
+```
+
+Then reference `lib/smltest/sources.mlb` on your project's `.mlb` file. Example:
+
+```sml
+$(SML_LIB)/basis/basis.mlb
+lib/smltest/sources.mlb
+main.sml
+```
+
 ## Usage
 
 ```sml
@@ -27,8 +41,8 @@ val _ =
 Check out the table of contents below for more information:
 
 - [smltest](#smltest)
+  - [Installation](#installation)
   - [Usage](#usage)
-  - [Installing](#installing)
 - [API Reference](#api-reference)
   - [Test](#test)
     - [concat](#concat)
@@ -64,9 +78,6 @@ Check out the table of contents below for more information:
     - [greaterfmt](#greaterfmt)
   - [License](#license)
 
-## Installing
-
-<!-- TODO -->
 
 # API Reference
 
