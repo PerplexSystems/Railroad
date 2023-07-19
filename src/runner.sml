@@ -16,30 +16,20 @@ structure Runner =
 struct
   open Expectation
 
-  datatype RunnerOption =
-    Output of TextIO.outstream
-  | Seed of int option
-  | Sequenced
+  datatype RunnerOrder = Sequenced | Randomized of int option
 
-  type RunnerOptionRecord =
-    {output: TextIO.outstream, seed: int option, sequenced: bool}
+  datatype RunnerOption = Output of TextIO.outstream | Order of RunnerOrder
 
-  val defaultRunnerOptions =
-    {output = TextIO.stdOut, seed = NONE, sequenced = false}
+  type RunnerOptionRecord = {output: TextIO.outstream, order: RunnerOrder}
+
+  val defaultRunnerOptions = {output = TextIO.stdOut, order = Randomized NONE}
 
   fun runnerOptionFromList options =
     List.foldl
       (fn (opt, acc) =>
          case opt of
-           Output value =>
-             {output = value, seed = (#seed acc), sequenced = (#sequenced acc)}
-         | Seed value =>
-             { output = (#output acc)
-             , seed = value
-             , sequenced = (#sequenced acc)
-             }
-         | Sequenced =>
-             {output = (#output acc), seed = (#seed acc), sequenced = true})
+           Output value => {output = value, order = (#order acc)}
+         | Order value => {output = (#output acc), order = value})
       defaultRunnerOptions options
 
   type Runner = {run: unit -> Expectation, labels: string list}
@@ -178,7 +168,7 @@ struct
   fun runWithOptions options test =
     let
       val runners = fromtest test
-      val {output, sequenced, seed} = runnerOptionFromList options
+      val {output, ...} = runnerOptionFromList options
     in
       case runners of
         Plain rs =>
