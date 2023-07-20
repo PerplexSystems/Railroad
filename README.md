@@ -150,7 +150,7 @@ describe "math operators"
 
 `val run: Test -> unit`
 
-Runs the provided tests with default options and exits with success
+Runs the provided tests with [default configuration](#testconfiguration) and exits with success
 or failure based on the results.
 
 ```sml
