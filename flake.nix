@@ -20,14 +20,14 @@
 
               installPhase = ''
                 mkdir -p $out
-                
+
                 # remove first heading
                 sed -i '1d' README.md
 
                 # add frontmatter to markdown file, required by hugo
-                sed -i '1s/^/---\ntitle: smltest\n---\n\n/' README.md
-                
-                cp README.md $out/smltest.md
+                sed -i '1s/^/---\ntitle: Railroad\n---\n\n/' README.md
+
+                cp README.md $out/Railroad.md
                 cp -r docs $out/
               '';
             };
@@ -73,10 +73,10 @@
                 mlton mlkit
 
                 # tools
-                millet smlfmt 
-                
+                millet smlfmt
+
                 # other
-                gnumake gcc 
+                gnumake gcc
               ];
             }];
           };

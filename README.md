@@ -1,6 +1,6 @@
-# smltest
+# Railroad
 
-[![Build Status](https://github.com/PerplexSystems/smltest/actions/workflows/build.yml/badge.svg)](https://github.com/PerplexSystems/smltest/actions)
+[![Build Status](https://github.com/PerplexSystems/Railroad/actions/workflows/build.yml/badge.svg)](https://github.com/PerplexSystems/Railroad/actions)
 [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 [![Perplex Systems on libera.chat](https://img.shields.io/badge/libera.chat-%23perplexsystems-blue.svg)](http://webchat.freenode.net/?channels=writeas)
 
@@ -14,14 +14,14 @@ along with a built-in test runner.
 ## Installation
 
 ```sh
-$ git clone https://github.com/PerplexSystems/smltest.git $YOUR_PROJECT/vendor/smltest
+$ git clone https://github.com/PerplexSystems/Railroad.git $YOUR_PROJECT/vendor/Railroad
 ```
 
-Then reference `vendor/smltest/sources.mlb` on your project's `.mlb` file. Example:
+Then reference `vendor/Railroad/sources.mlb` on your project's `.mlb` file. Example:
 
 ```sml
 $(SML_LIB)/basis/basis.mlb
-lib/smltest/sources.mlb
+lib/Railroad/sources.mlb
 main.sml
 ```
 
@@ -40,7 +40,7 @@ val _ =
 
 Check out the table of contents below for more information:
 
-- [smltest](#smltest)
+- [Railroad](#Railroad)
   - [Installation](#installation)
   - [Usage](#usage)
 - [API Reference](#api-reference)
