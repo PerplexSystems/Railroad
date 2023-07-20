@@ -40,7 +40,7 @@ val _ =
 
 Check out the table of contents below for more information:
 
-- [Railroad](#Railroad)
+- [Railroad](#railroad)
   - [Installation](#installation)
   - [Usage](#usage)
 - [API Reference](#api-reference)
@@ -49,7 +49,7 @@ Check out the table of contents below for more information:
     - [describe](#describe)
     - [focus](#focus)
     - [run](#run)
-    - [runwithoptions](#runwithoptions)
+    - [runWithOptions](#runwithoptions)
     - [skip](#skip)
     - [test](#test-1)
   - [Expect](#expect)
@@ -145,11 +145,28 @@ describe "math operators"
 
 ### run
 
-<!-- TODO -->
+`val run: Test -> unit`
 
-### runwithoptions
+Runs the provided tests with default options and exits with success
+or failure based on the results.
 
-<!-- TODO -->
+```sml
+run (test "sum" (fn _ => Expect.equal Int.compare 2 (1 + 1)))
+```
+
+### runWithOptions
+
+`val runWithOptions: RunnerOption list -> `
+
+Runs the provided tests with the provided options, exits with
+success or failure based on the tests results
+
+```sml
+val sumTest =
+  (test "sum" (fn _ => Expect.equal Int.compare 2 (1 + 1)))
+
+runWithOptions [ Output TextIO.stdOut ] sumTest
+```
 
 ### skip
 
