@@ -167,8 +167,18 @@ struct
 
   fun runWithOptions options test =
     let
-      val runners = fromtest test
-      val {output, ...} = runnerOptionFromList options
+      val {output, order } = runnerOptionFromList options
+
+      val runners =
+        let
+          val runners = fromtest test
+        in
+          case order of
+            Sequenced => runners
+          | Randomized _ =>
+            (* TODO: this needs a List.shuffle method *)
+            runners
+        end
     in
       case runners of
         Plain rs =>
