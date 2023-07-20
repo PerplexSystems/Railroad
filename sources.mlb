@@ -1,5 +1,6 @@
 local
     $(SML_LIB)/basis/basis.mlb
+    src/configuration.sml
     src/expectation.sml
     src/internal.sml
     src/runner.sml

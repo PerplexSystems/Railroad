@@ -16,22 +16,6 @@ structure Runner =
 struct
   open Expectation
 
-  datatype RunnerOrder = Sequenced | Randomized of int option
-
-  datatype RunnerOption = Output of TextIO.outstream | Order of RunnerOrder
-
-  type RunnerOptionRecord = {output: TextIO.outstream, order: RunnerOrder}
-
-  val defaultRunnerOptions = {output = TextIO.stdOut, order = Randomized NONE}
-
-  fun runnerOptionFromList options =
-    List.foldl
-      (fn (opt, acc) =>
-         case opt of
-           Output value => {output = value, order = (#order acc)}
-         | Order value => {output = (#output acc), order = value})
-      defaultRunnerOptions options
-
   type Runner = {run: unit -> Expectation, labels: string list}
 
   datatype Runnable = Thunk of (unit -> Expectation)
@@ -165,12 +149,14 @@ struct
       )
     end
 
-  fun runWithOptions options test =
+  fun runWithConfig options test =
     let
-      val {output, order} = runnerOptionFromList options
+      val {output, order} = Configuration.ofList options
 
       val runners =
         let
+          open Configuration
+
           val runners = fromtest test
         in
           case order of
@@ -207,5 +193,5 @@ struct
       | Invalid _ => (* TODO *) OS.Process.exit OS.Process.failure
     end
 
-  fun run test = runWithOptions [] test
+  fun run test = runWithConfig [] test
 end
