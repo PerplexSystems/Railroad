@@ -42,7 +42,7 @@ struct
     let
       val desc = Internal.String.trim description
     in
-      if desc = "" then blackdescriptionfail
+      if desc = "" then blankDescriptionFail
       else Labeled (description, UnitTest code)
     end
 

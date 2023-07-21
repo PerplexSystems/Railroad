@@ -62,23 +62,23 @@ Check out the table of contents below for more information:
     - [tostring](#tostring)
     - [pass](#pass)
     - [fail](#fail)
-    - [onfail](#onfail)
-    - [istrue](#istrue)
-    - [isfalse](#isfalse)
+    - [onFail](#onfail)
+    - [isTrue](#istrue)
+    - [isFalse](#isfalse)
     - [some](#some)
     - [none](#none)
     - [equal](#equal)
-    - [equalfmt](#equalfmt)
-    - [notequal](#notequal)
-    - [notequalfmt](#notequalfmt)
-    - [atmost](#atmost)
-    - [atmostfmt](#atmostfmt)
-    - [atleast](#atleast)
-    - [atleastfmt](#atleastfmt)
+    - [equalFmt](#equalfmt)
+    - [notEqual](#notequal)
+    - [notEqualFmt](#notequalfmt)
+    - [atMost](#atmost)
+    - [atMostFmt](#atmostfmt)
+    - [atLeast](#atleast)
+    - [atLeastFmt](#atleastfmt)
     - [less](#less)
-    - [lessfmt](#lessfmt)
+    - [lessFmt](#lessfmt)
     - [greater](#greater)
-    - [greaterfmt](#greaterfmt)
+    - [greaterFmt](#greaterfmt)
   - [License](#license)
 
 
@@ -298,38 +298,38 @@ test "this sum is always two" (fn _ =>
     Expect.fail "man, something is up...")
 ```
 
-### onfail
+### onFail
 
-`val onfail: string -> Expectation -> Expectation`
+`val onFail: string -> Expectation -> Expectation`
 
 If the given expectation fails, replace its failure message with a
 custom one.
 
 ```sml
 test "sum" (fn _ =>
-  Expect.onfail 
+  Expect.onFail 
     "this shouldn't be failing" 
     (Expect.equal Int.compare 4 (2 + 2)))
 ```
 
-### istrue
+### isTrue
 
-`val istrue: bool actual -> Expectation`
+`val isTrue: bool actual -> Expectation`
 
 Passes if the provided value is `true`.
 
 ```sml
-Expect.istrue (2 > 1)
+Expect.isTrue (2 > 1)
 ```
 
-### isfalse
+### isFalse
 
-`val isfalse: bool actual -> Expectation`
+`val isFalse: bool actual -> Expectation`
 
 Passes if the provided value is `false`.
 
 ```sml
-Expect.istrue (2 < 1)
+Expect.isTrue (2 < 1)
 ```
 
 ### some
@@ -364,9 +364,9 @@ Passes if the arguments are equal.
 Expect.equal Int.compare 2 (1 + 1)
 ```
 
-### equalfmt
+### equalFmt
 
-`val equalfmt: 'a comparer -> 'a tostring -> 'a expected -> 'a actual
+`val equalFmt: 'a comparer -> 'a tostring -> 'a expected -> 'a actual
 -> Expectation`
 
 Passes if the arguments are equal, but receives a
@@ -374,22 +374,22 @@ Passes if the arguments are equal, but receives a
 `Expectation`.
 
 ```sml
-Expect.equalfmt Int.compare Int.toString 2 (1 + 1)
+Expect.equalFmt Int.compare Int.toString 2 (1 + 1)
 ```
 
-### notequal
+### notEqual
 
-`val notequal: 'a comparer -> 'a expected -> 'a actual -> Expectation`
+`val notEqual: 'a comparer -> 'a expected -> 'a actual -> Expectation`
 
 Passes if the arguments are not equal.
 
 ```sml
-Expect.notequal Int.compare 3 (1 + 1)
+Expect.notEqual Int.compare 3 (1 + 1)
 ```
 
-### notequalfmt
+### notEqualFmt
 
-`val notequalfmt: 'a comparer -> 'a tostring -> 'a expected -> 'a
+`val notEqualFmt: 'a comparer -> 'a tostring -> 'a expected -> 'a
 actual -> Expectation`
 
 Passes if the arguments are not equal, but receives a
@@ -397,23 +397,23 @@ Passes if the arguments are not equal, but receives a
 `Expectation`.
 
 ```sml
-Expect.equalfmt Int.compare Int.toString 2 (1 + 1)
+Expect.equalFmt Int.compare Int.toString 2 (1 + 1)
 ```
 
-### atmost
+### atMost
 
-`val atmost: 'a comparer -> 'a expected -> 'a actual -> Expectation`
+`val atMost: 'a comparer -> 'a expected -> 'a actual -> Expectation`
 
 Passes if the provide value is less or equal than the expected value.
 
 ```sml
-Expect.atmost Int.compare 3 2
-Expect.atmost Int.compare 2 2
+Expect.atMost Int.compare 3 2
+Expect.atMost Int.compare 2 2
 ```
 
-### atmostfmt
+### atMostFmt
 
-`val atmostfmt: 'a comparer -> 'a tostring-> 'a expected-> 'a actual->
+`val atMostFmt: 'a comparer -> 'a tostring-> 'a expected-> 'a actual->
 Expectation`
 
 Passes if the provided value is less or equal than the expeted value,
@@ -421,25 +421,25 @@ but receives a [`tostring`](#tostring) that encapsulates the values on
 the `Expectation`.
 
 ```sml
-Expect.atmost Int.compare Int.toString 3 2
-Expect.atmost Int.compare Int.toString 2 2
+Expect.atMost Int.compare Int.toString 3 2
+Expect.atMost Int.compare Int.toString 2 2
 ```
 
-### atleast
+### atLeast
 
-`val atleast: 'a comparer -> 'a expected -> 'a actual -> Expectation`
+`val atLeast: 'a comparer -> 'a expected -> 'a actual -> Expectation`
 
 Passes if the provide value is greater or equal than the expected
 value.
 
 ```sml
-Expect.atmost Int.compare 3 4
-Expect.atmost Int.compare 3 3
+Expect.atMost Int.compare 3 4
+Expect.atMost Int.compare 3 3
 ```
 
-### atleastfmt
+### atLeastFmt
 
-`val atleastfmt: 'a comparer -> 'a tostring -> 'a expected -> 'a
+`val atLeastFmt: 'a comparer -> 'a tostring -> 'a expected -> 'a
 actual -> Expectation`
 
 Passes if the provided value is greater or equal than the expeted
@@ -447,8 +447,8 @@ value, but receives a [`tostring`](#tostring) that encapsulates the
 values on the `Expectation`.
 
 ```sml
-Expect.atmost Int.compare Int.toString 3 4
-Expect.atmost Int.compare Int.toString 3 3
+Expect.atMost Int.compare Int.toString 3 4
+Expect.atMost Int.compare Int.toString 3 3
 ```
 
 ### less
@@ -458,12 +458,12 @@ Expect.atmost Int.compare Int.toString 3 3
 Passes if the provided value is less than the expected value.
 
 ```sml
-Expect.notequal Int.compare 3 (1 + 1)
+Expect.notEqual Int.compare 3 (1 + 1)
 ```
 
-### lessfmt
+### lessFmt
 
-`val lessfmt: 'a comparer -> 'a tostring -> 'a expected -> 'a actual
+`val lessFmt: 'a comparer -> 'a tostring -> 'a expected -> 'a actual
 -> Expectation`
 
 Passes if the provided value is less than the expeted value, but
@@ -471,7 +471,7 @@ receives a [`tostring`](#tostring) that encapsulates the values on the
 `Expectation`.
 
 ```sml
-Expect.atmost Int.compare Int.toString 3 2
+Expect.atMost Int.compare Int.toString 3 2
 ```
 
 ### greater
@@ -481,12 +481,12 @@ Expect.atmost Int.compare Int.toString 3 2
 Passes if the provided value is greater than the expected value.
 
 ```sml
-Expect.notequal Int.compare 3 4
+Expect.notEqual Int.compare 3 4
 ```
 
-### greaterfmt
+### greaterFmt
 
-`val greaterfmt: 'a comparer -> 'a tostring -> 'a expected -> 'a
+`val greaterFmt: 'a comparer -> 'a tostring -> 'a expected -> 'a
 actual -> Expectation`
 
 Passes if the provided value is greater than the expeted value, but
@@ -494,7 +494,7 @@ receives a [`tostring`](#tostring) that encapsulates the values on the
 `Expectation`.
 
 ```sml
-Expect.atmost Int.compare Int.toString 3 4
+Expect.atMost Int.compare Int.toString 3 4
 ```
 
 ## License

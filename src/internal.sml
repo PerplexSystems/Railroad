@@ -28,7 +28,7 @@ datatype Test =
 fun failnow record =
   UnitTest (fn _ => Expectation.fail record)
 
-val blackdescriptionfail =
+val blankDescriptionFail =
   let
     open Expectation
   in
