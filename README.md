@@ -40,7 +40,7 @@ val _ =
 
 Check out the table of contents below for more information:
 
-- [Railroad](#Railroad)
+- [Railroad](#railroad)
   - [Installation](#installation)
   - [Usage](#usage)
 - [API Reference](#api-reference)
@@ -49,9 +49,12 @@ Check out the table of contents below for more information:
     - [describe](#describe)
     - [focus](#focus)
     - [run](#run)
-    - [runwithoptions](#runwithoptions)
+    - [runWithConfig](#runwithconfig)
     - [skip](#skip)
     - [test](#test-1)
+  - [Test.Configuration](#testconfiguration)
+    - [Order](#order)
+    - [Configuration](#configuration)
   - [Expect](#expect)
     - [actual](#actual)
     - [expected](#expected)
@@ -145,11 +148,28 @@ describe "math operators"
 
 ### run
 
-<!-- TODO -->
+`val run: Test -> unit`
 
-### runwithoptions
+Runs the provided tests with [default configuration](#testconfiguration) and exits with success
+or failure based on the results.
 
-<!-- TODO -->
+```sml
+run (test "sum" (fn _ => Expect.equal Int.compare 2 (1 + 1)))
+```
+
+### runWithConfig
+
+`val runWithConfig: Configuration list -> `
+
+Runs the provided tests with the provided [`Configuration`](#configuration) 
+options, exits with success or failure based on the tests results.
+
+```sml
+val sumTest =
+  (test "sum" (fn _ => Expect.equal Int.compare 2 (1 + 1)))
+
+runWithConfig [ Output TextIO.stdOut ] sumTest
+```
 
 ### skip
 
@@ -187,6 +207,38 @@ Return a [`Test`](#test) that evaluates a single `Expectation`.
 ```sml
 test "sum" (fn _ => Expect.equal Int.compare 2 (1 + 1))
 ```
+
+## Test.Configuration
+
+The [`Test`](#test) module consists of types and functions that are involved in 
+configuring the test runner.
+
+The default configuration value is the following:
+
+```sml
+{ output = TextIO.stdOut
+, order = Sequenced }
+```
+
+### Order
+
+`datatype Order = Sequenced | Randomized of int`
+
+Represents the order the tests should run.
+
+- Sequenced: The tests are ran in the same order as declared.
+- Randomized: The tests will be shuffled before running. This expects an 
+  `int option`, in case of `SOME`, the value will be used as a seed. In case of
+  `NONE`, a random value will be used.
+
+### Configuration
+
+`datatype Configuration = Order of Order | Output of TextIO.outstream`
+
+Represents the possible options for the runner configuration.
+
+- [`Order`](#order): The order which the tests will ran.
+- Output: Where the output should be redirected to.
 
 ## Expect
 

@@ -1,5 +1,7 @@
 signature TEST =
 sig
+  structure Configuration: CONFIGURATION
+
   val describe: string -> Test list -> Test
   val test: string -> (unit -> Expectation.Expectation) -> Test
   val skip: Test -> Test
@@ -7,11 +9,13 @@ sig
   val concat: Test list -> Test
 
   val run: Test -> unit
+  val runWithConfig: Configuration.Configuration list -> Test -> unit
 end
 
 structure Test: TEST =
 struct
   structure Expectation = Expectation
+  structure Configuration = Configuration
 
   open Expectation
 
@@ -70,4 +74,5 @@ struct
           end
 
   fun run test = Runner.run test
+  fun runWithConfig options test = Runner.runWithConfig options test
 end
