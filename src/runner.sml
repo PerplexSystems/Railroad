@@ -8,13 +8,14 @@ sig
   | Skipping of Runner list
   | Invalid of string
 
-  val fromtest: Test -> Runners
+  val fromtest: Internal.Test -> Runners
   val failurereason: Expectation.Expectation -> Expectation.fail option
 end
 
 structure Runner =
 struct
   open Expectation
+  open Internal
 
   type Runner = {run: unit -> Expectation, labels: string list}
 

@@ -1,6 +1,7 @@
-signature TEST =
+structure Test:
 sig
-  structure Configuration: CONFIGURATION
+  type Test = Internal.Test
+  structure Configuration : CONFIGURATION
 
   val describe: string -> Test list -> Test
   val test: string -> (unit -> Expectation.Expectation) -> Test
@@ -9,15 +10,12 @@ sig
   val concat: Test list -> Test
 
   val run: Test -> unit
-  val runWithConfig: Configuration.Configuration list -> Test -> unit
-end
-
-structure Test: TEST =
+  val runWithConfig: Configuration.Setting list -> Test -> unit
+end =
 struct
-  structure Expectation = Expectation
   structure Configuration = Configuration
-
   open Expectation
+  open Internal
 
   fun describe description tests =
     let
