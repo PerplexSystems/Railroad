@@ -26,7 +26,7 @@ struct
                       Focusing rs => List.length rs
                     | _ => 0
                 in
-                  (Expect.equalfmt Int.compare Int.toString expected actual)
+                  (Expect.equalFmt Int.compare Int.toString expected actual)
                 end)
 
             , test "a skip inside a focus takes effect" (fn _ =>
@@ -47,7 +47,7 @@ struct
                       Focusing rs => List.length rs
                     | _ => 0
                 in
-                  (Expect.equalfmt Int.compare Int.toString expected actual)
+                  (Expect.equalFmt Int.compare Int.toString expected actual)
                 end)
 
             , test "a focus inside a skip has no effect" (fn _ =>
@@ -68,7 +68,7 @@ struct
                       Skipping rs => List.length rs
                     | _ => 0
                 in
-                  (Expect.equalfmt Int.compare Int.toString expected actual)
+                  (Expect.equalFmt Int.compare Int.toString expected actual)
                 end)
             ]
         , describe "todistribution"
@@ -80,7 +80,7 @@ struct
                   val expected = 1
                   val actual = List.length (#all distribution)
                 in
-                  Expect.equalfmt Int.compare Int.toString expected actual
+                  Expect.equalFmt Int.compare Int.toString expected actual
                 end)
             , test "have a focused test" (fn _ =>
                 let
@@ -91,7 +91,7 @@ struct
                   val distribution = todistribution tests
                   val actual = List.length (#focused distribution)
                 in
-                  Expect.equalfmt Int.compare Int.toString 1 actual
+                  Expect.equalFmt Int.compare Int.toString 1 actual
                 end)
             ]
         ]

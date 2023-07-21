@@ -13,7 +13,7 @@ struct
                  val expected = ""
                  val actual = Expectation.toString Expect.pass
                in
-                 Expect.equalfmt String.compare String.toString expected actual
+                 Expect.equalFmt String.compare String.toString expected actual
                end)
 
            , describe "Fail"
@@ -25,7 +25,7 @@ struct
                          {description = expected, reason = Expectation.Custom}
                      val actual = Expectation.toString expectation
                    in
-                     Expect.equalfmt String.compare String.toString expected
+                     Expect.equalFmt String.compare String.toString expected
                        actual
                    end)
 
@@ -39,7 +39,7 @@ struct
                          }
                      val actual = Expectation.toString expectation
                    in
-                     Expect.equalfmt String.compare String.toString expected
+                     Expect.equalFmt String.compare String.toString expected
                        actual
                    end)
 
@@ -53,7 +53,7 @@ struct
                        }
                      val actual = Expectation.toString expectation
                    in
-                     Expect.equalfmt String.compare String.toString expected
+                     Expect.equalFmt String.compare String.toString expected
                        actual
                    end)
 
@@ -70,7 +70,7 @@ struct
                              }
                          val actual = Expectation.toString expectation
                        in
-                         Expect.equalfmt String.compare String.toString expected
+                         Expect.equalFmt String.compare String.toString expected
                            actual
                        end)
 
@@ -86,7 +86,7 @@ struct
                              }
                          val actual = Expectation.toString expectation
                        in
-                         Expect.equalfmt String.compare String.toString expected
+                         Expect.equalFmt String.compare String.toString expected
                            actual
                        end)
 
@@ -102,7 +102,7 @@ struct
                              }
                          val actual = Expectation.toString expectation
                        in
-                         Expect.equalfmt String.compare String.toString expected
+                         Expect.equalFmt String.compare String.toString expected
                            actual
                        end)
                    ]

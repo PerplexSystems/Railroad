@@ -8,50 +8,50 @@ sig
 
   val pass: Expectation.Expectation
   val fail: string -> Expectation.Expectation
-  val onfail: string -> Expectation.Expectation -> Expectation.Expectation
+  val onFail: string -> Expectation.Expectation -> Expectation.Expectation
 
-  val istrue: bool actual -> Expectation.Expectation
-  val isfalse: bool actual -> Expectation.Expectation
+  val isTrue: bool actual -> Expectation.Expectation
+  val isFalse: bool actual -> Expectation.Expectation
 
   val some: 'a option actual -> Expectation.Expectation
   val none: 'a option actual -> Expectation.Expectation
 
   val equal: 'a comparer -> 'a expected -> 'a actual -> Expectation.Expectation
-  val equalfmt: 'a comparer
+  val equalFmt: 'a comparer
                 -> 'a formatter
                 -> 'a expected
                 -> 'a actual
                 -> Expectation.Expectation
 
-  val notequal: 'a comparer
+  val notEqual: 'a comparer
                 -> 'a expected
                 -> 'a actual
                 -> Expectation.Expectation
-  val notequalfmt: 'a comparer
+  val notEqualFmt: 'a comparer
                    -> 'a formatter
                    -> 'a expected
                    -> 'a actual
                    -> Expectation.Expectation
 
-  val atmost: 'a comparer -> 'a expected -> 'a actual -> Expectation.Expectation
-  val atmostfmt: 'a comparer
+  val atMost: 'a comparer -> 'a expected -> 'a actual -> Expectation.Expectation
+  val atMostFmt: 'a comparer
                  -> 'a formatter
                  -> 'a expected
                  -> 'a actual
                  -> Expectation.Expectation
 
-  val atleast: 'a comparer
+  val atLeast: 'a comparer
                -> 'a expected
                -> 'a actual
                -> Expectation.Expectation
-  val atleastfmt: 'a comparer
+  val atLeastFmt: 'a comparer
                   -> 'a formatter
                   -> 'a expected
                   -> 'a actual
                   -> Expectation.Expectation
 
   val less: 'a comparer -> 'a expected -> 'a actual -> Expectation.Expectation
-  val lessfmt: 'a comparer
+  val lessFmt: 'a comparer
                -> 'a formatter
                -> 'a expected
                -> 'a actual
@@ -61,7 +61,7 @@ sig
                -> 'a expected
                -> 'a actual
                -> Expectation.Expectation
-  val greaterfmt: 'a comparer
+  val greaterFmt: 'a comparer
                   -> 'a formatter
                   -> 'a expected
                   -> 'a actual
@@ -86,26 +86,26 @@ struct
 
   val pass = Expectation.Pass
   fun fail str = Expectation.fail {description = str, reason = Custom}
-  fun onfail str expectation =
+  fun onFail str expectation =
     case expectation of
       Pass => expectation
     | Fail _ => fail str
 
-  fun istrue actual =
+  fun isTrue actual =
     if actual then
       Pass
     else
       Expectation.fail
-        { description = "Expect.istrue"
+        { description = "Expect.isTrue"
         , reason = Equality "The value provided is not true."
         }
 
-  fun isfalse actual =
+  fun isFalse actual =
     if Bool.not actual then
       Pass
     else
       Expectation.fail
-        { description = "Expect.isfalse"
+        { description = "Expect.isFalse"
         , reason = Equality "The value provided is not false."
         }
 
@@ -137,71 +137,71 @@ struct
               "The value provided is not equal to the expected one."
           }
 
-  fun equalfmt comparer formatter expected actual =
+  fun equalFmt comparer formatter expected actual =
     case equal comparer expected actual of
       Pass => Pass
     | _ =>
         Expectation.fail
-          { description = "Expect.equalfmt"
+          { description = "Expect.equalFmt"
           , reason = EqualityFormatter
               ((formatter expected), (formatter actual))
           }
 
-  fun notequal comparer expected actual =
+  fun notEqual comparer expected actual =
     case comparer (actual, expected) of
       EQUAL =>
         Expectation.fail
-          { description = "Expect.notequal"
+          { description = "Expect.notEqual"
           , reason = Equality "The value provided is equal to the expected one."
           }
     | _ => Pass
 
-  fun notequalfmt comparer formatter expected actual =
-    case notequal comparer expected actual of
+  fun notEqualFmt comparer formatter expected actual =
+    case notEqual comparer expected actual of
       Pass => Pass
     | _ =>
         Expectation.fail
-          { description = "Expect.notequalfmt"
+          { description = "Expect.notEqualFmt"
           , reason = EqualityFormatter
               ((formatter expected), (formatter actual))
           }
 
-  fun atmost comparer expected actual =
+  fun atMost comparer expected actual =
     case comparer (actual, expected) of
       GREATER =>
         Expectation.fail
-          { description = "Expect.atmost"
+          { description = "Expect.atMost"
           , reason = Equality
               "The value provided is greater than the expected one."
           }
     | _ => Pass
 
-  fun atmostfmt comparer formatter expected actual =
-    case atmost comparer expected actual of
+  fun atMostFmt comparer formatter expected actual =
+    case atMost comparer expected actual of
       Pass => Pass
     | _ =>
         Expectation.fail
-          { description = "Expect.atmostfmt"
+          { description = "Expect.atMostFmt"
           , reason = EqualityFormatter
               ((formatter expected), (formatter actual))
           }
 
-  fun atleast comparer expected actual =
+  fun atLeast comparer expected actual =
     case comparer (actual, expected) of
       LESS =>
         Expectation.fail
-          { description = "Expect.notequal"
+          { description = "Expect.notEqual"
           , reason = Equality
               "The value provided is less than the expected one."
           }
     | _ => Pass
 
-  fun atleastfmt comparer formatter expected actual =
-    case atleast comparer expected actual of
+  fun atLeastFmt comparer formatter expected actual =
+    case atLeast comparer expected actual of
       Pass => Pass
     | _ =>
         Expectation.fail
-          { description = "Expect.atleastfmt"
+          { description = "Expect.atLeastFmt"
           , reason = EqualityFormatter
               ((formatter expected), (formatter actual))
           }
@@ -216,12 +216,12 @@ struct
               "The value provided is not less than the expected one."
           }
 
-  fun lessfmt comparer formatter expected actual =
+  fun lessFmt comparer formatter expected actual =
     case less comparer expected actual of
       Pass => Pass
     | _ =>
         Expectation.fail
-          { description = "Expect.lessfmt"
+          { description = "Expect.lessFmt"
           , reason = EqualityFormatter
               ((formatter expected), (formatter actual))
           }
@@ -236,12 +236,12 @@ struct
               "The value provided is not greater than the expected one."
           }
 
-  fun greaterfmt comparer formatter expected actual =
+  fun greaterFmt comparer formatter expected actual =
     case greater comparer expected actual of
       Pass => Pass
     | _ =>
         Expectation.fail
-          { description = "Expect.greaterfmt"
+          { description = "Expect.greaterFmt"
           , reason = EqualityFormatter
               ((formatter expected), (formatter actual))
           }
