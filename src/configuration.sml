@@ -2,16 +2,20 @@ signature CONFIGURATION =
 sig
   datatype Order = Sequenced | Randomized of int option
 
-  datatype Configuration = Order of Order | Output of TextIO.outstream
+  datatype Setting = Order of Order | Output of TextIO.outstream
+
+  type Configuration = {output: TextIO.outstream, order: Order}
+
+  val ofList: Setting list -> Configuration
 end
 
-structure Configuration =
+structure Configuration: CONFIGURATION =
 struct
   datatype Order = Sequenced | Randomized of int option
 
-  datatype Configuration = Order of Order | Output of TextIO.outstream
+  datatype Setting = Order of Order | Output of TextIO.outstream
 
-  type ConfigurationRecord = {output: TextIO.outstream, order: Order}
+  type Configuration = {output: TextIO.outstream, order: Order}
 
   val default = {output = TextIO.stdOut, order = Sequenced}
 
@@ -22,5 +26,4 @@ struct
            Output output => {output = output, order = (#order acc)}
          | Order order => {output = (#output acc), order = order}) default
       options
-
 end

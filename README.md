@@ -17,7 +17,8 @@ along with a built-in test runner.
 $ git clone https://github.com/PerplexSystems/Railroad.git $YOUR_PROJECT/vendor/Railroad
 ```
 
-Then reference `vendor/Railroad/sources.mlb` on your project's `.mlb` file. Example:
+Then reference `vendor/Railroad/sources.mlb` on your project's `.mlb`
+file. Example:
 
 ```sml
 $(SML_LIB)/basis/basis.mlb
@@ -54,7 +55,7 @@ Check out the table of contents below for more information:
     - [test](#test-1)
   - [Test.Configuration](#testconfiguration)
     - [Order](#order)
-    - [Configuration](#configuration)
+    - [Setting](#setting)
   - [Expect](#expect)
     - [actual](#actual)
     - [expected](#expected)
@@ -150,8 +151,9 @@ describe "math operators"
 
 `val run: Test -> unit`
 
-Runs the provided tests with [default configuration](#testconfiguration) and exits with success
-or failure based on the results.
+Runs the provided tests with [default
+configuration](#testconfiguration) and exits with success or failure
+based on the results.
 
 ```sml
 run (test "sum" (fn _ => Expect.equal Int.compare 2 (1 + 1)))
@@ -159,16 +161,16 @@ run (test "sum" (fn _ => Expect.equal Int.compare 2 (1 + 1)))
 
 ### runWithConfig
 
-`val runWithConfig: Configuration list -> `
+`val runWithConfig: Setting list -> `
 
-Runs the provided tests with the provided [`Configuration`](#configuration) 
-options, exits with success or failure based on the tests results.
+Runs the provided tests with the provided [`Setting`](#setting)s,
+exits with success or failure based on the tests results.
 
 ```sml
 val sumTest =
   (test "sum" (fn _ => Expect.equal Int.compare 2 (1 + 1)))
 
-runWithConfig [ Output TextIO.stdOut ] sumTest
+runWithConfig [ Output TextIO.stdOut, Order Sequenced ] sumTest
 ```
 
 ### skip
@@ -210,10 +212,10 @@ test "sum" (fn _ => Expect.equal Int.compare 2 (1 + 1))
 
 ## Test.Configuration
 
-The [`Test`](#test) module consists of types and functions that are involved in 
+The [`Test`](#test) module consists of types and functions that are involved in
 configuring the test runner.
 
-The default configuration value is the following:
+The default [`Setting`](#setting)s are the following:
 
 ```sml
 { output = TextIO.stdOut
@@ -231,11 +233,11 @@ Represents the order the tests should run.
   `int option`, in case of `SOME`, the value will be used as a seed. In case of
   `NONE`, a random value will be used.
 
-### Configuration
+### Setting
 
-`datatype Configuration = Order of Order | Output of TextIO.outstream`
+`datatype Setting = Order of Order | Output of TextIO.outstream`
 
-Represents the possible options for the runner configuration.
+Represents the possible settings for the runner configuration.
 
 - [`Order`](#order): The order which the tests will ran.
 - Output: Where the output should be redirected to.
