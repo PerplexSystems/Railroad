@@ -4,6 +4,8 @@
 [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 [![Perplex Systems on libera.chat](https://img.shields.io/badge/libera.chat-%23perplexsystems-blue.svg)](http://webchat.freenode.net/?channels=writeas)
 
+![Railroad logo](./docs/images/logo.png)
+
 An advanced testing library and test runner for Standard ML, highly
 inspired by [elm-test](https://github.com/elm-explorations/test) and
 [Expecto](https://github.com/haf/expecto).
