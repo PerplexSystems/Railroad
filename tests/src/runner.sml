@@ -7,7 +7,7 @@ struct
       open TestHelper
     in
       describe "Runner"
-        [ describe "fromtest"
+        [ describe "fromTest"
             [ test "focus inside a focus has no effect" (fn _ =>
                 let
                   val tests = describe "three tests"
@@ -19,7 +19,7 @@ struct
                         ])
                     ]
 
-                  val runners = fromtest tests
+                  val runners = fromTest tests
                   val expected = 2
                   val actual =
                     case runners of
@@ -40,7 +40,7 @@ struct
                         ])
                     ]
 
-                  val runners = fromtest tests
+                  val runners = fromTest tests
                   val expected = 1
                   val actual =
                     case runners of
@@ -61,7 +61,7 @@ struct
                         ])
                     ]
 
-                  val runners = fromtest tests
+                  val runners = fromTest tests
                   val expected = 1
                   val actual =
                     case runners of

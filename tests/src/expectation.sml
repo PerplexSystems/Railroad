@@ -76,11 +76,10 @@ struct
 
                    , test "DuplicatedName" (fn _ =>
                        let
-                         val expected =
-                           "Expectation.DuplicatedName: duplicated name."
+                         val expected = "Expectation.DuplicatedName"
                          val expectation =
                            Expectation.fail
-                             { description = "Expectation.DuplicatedName"
+                             { description = expected
                              , reason =
                                  Expectation.Invalid Expectation.DuplicatedName
                              }

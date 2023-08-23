@@ -8,7 +8,7 @@ sig
   | Skipping of Runner list
   | Invalid of string
 
-  val fromtest: Internal.Test -> Runners
+  val fromTest: Internal.Test -> Runners
   val failurereason: Expectation.Expectation -> Expectation.fail option
 end
 
@@ -52,9 +52,9 @@ struct
       UnitTest code =>
         {all = [Runnable (Thunk (fn _ => code ()))], focused = [], skipped = []}
 
-    | Labeled (description, subTest) =>
+    | Labeled (description, ts) =>
         let
-          val next = todistribution subTest
+          val next = todistribution ts
           val labelTests = (fn tests => LabeledRunnable (description, tests))
         in
           { all = List.map labelTests (#all next)
@@ -63,29 +63,29 @@ struct
           }
         end
 
-    | Batch subTests =>
+    | Batch ts =>
         List.foldl
-          (fn (test, prev) =>
+          (fn (final, prev) =>
              let
-               val next = todistribution test
+               val next = todistribution final
              in
                { all = (#all prev) @ (#all next)
                , focused = (#focused prev) @ (#focused next)
                , skipped = (#skipped prev) @ (#skipped next)
                }
-             end) {all = [], focused = [], skipped = []} subTests
+             end) {all = [], focused = [], skipped = []} ts
 
-    | Focused test =>
-        let val next = todistribution test
+    | Focused t =>
+        let val next = todistribution t
         in {all = (#all next), focused = (#all next), skipped = (#skipped next)}
         end
 
-    | Skipped test =>
-        let val next = todistribution test
+    | Skipped t =>
+        let val next = todistribution t
         in {all = [], focused = [], skipped = (#all next)}
         end
 
-  fun fromtest test =
+  fun fromTest test =
     let
       val {focused, skipped, all} = todistribution test
 
@@ -118,8 +118,8 @@ struct
       val expectationstr = Expectation.toString expectation
       val str =
         case expectation of
-          Pass => "PASS - " ^ label
-        | Fail _ => "FAIL - " ^ label ^ "\n" ^ expectationstr ^ "\n"
+          Pass => "=== PASS: " ^ label
+        | Fail _ => "=== FAIL: " ^ label ^ "\n    " ^ expectationstr ^ "\n"
     in
       {result = str ^ "\n", passed = (expectation = Pass)}
     end
@@ -158,7 +158,7 @@ struct
         let
           open Configuration
 
-          val runners = fromtest test
+          val runners = fromTest test
         in
           case order of
             Sequenced => runners

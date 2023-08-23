@@ -35,9 +35,8 @@ struct
           | Invalid invalid =>
               case invalid of
                 EmptyList => (description ^ ": " ^ "list cannot be empty.")
-              | DuplicatedName => (description ^ ": " ^ "duplicated name.")
+              | DuplicatedName => description
               | BadDescription => (description ^ ": " ^ "bad description.")
         end
-
   val pass = Pass
 end

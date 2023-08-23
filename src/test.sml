@@ -1,7 +1,7 @@
 structure Test:
 sig
   type Test = Internal.Test
-  structure Configuration : CONFIGURATION
+  structure Configuration: CONFIGURATION
 
   val describe: string -> Test list -> Test
   val test: string -> (unit -> Expectation.Expectation) -> Test
@@ -19,7 +19,7 @@ struct
 
   fun describe description tests =
     let
-      val desc = Internal.String.trim description
+      val desc = String.trim description
     in
       if desc = "" then
         failnow
@@ -28,17 +28,39 @@ struct
           }
       else if List.null tests then
         failnow
-          { description = "This `describe " ^ desc ^ "` has no tests in it"
+          { description = "This `describe " ^ desc ^ "` has no tests in it."
           , reason = Invalid EmptyList
           }
       else
-        (* TODO: check for duplicates *)
-        Labeled (desc, Batch tests)
+        case duplicatedNames tests of
+          ERROR dups =>
+            let
+              fun dupDescription duped =
+                "The `describe` '" ^ desc ^ "' Contains multiple tests named '"
+                ^ duped ^ "'. Rename them to know which is which."
+            in
+              Labeled (desc, Internal.failnow
+                { description = String.concatWith "\n"
+                    (List.map dupDescription dups)
+                , reason = Invalid DuplicatedName
+                })
+            end
+        | OK children =>
+            if List.exists (fn x => x = desc) children then
+              Labeled (desc, Internal.failnow
+                { description =
+                    "The test '" ^ desc
+                    ^ "' contains a child test of the same name '" ^ desc
+                    ^ "'. Rename them to know which is which."
+                , reason = Invalid DuplicatedName
+                })
+            else
+              Labeled (desc, Batch tests)
     end
 
   fun test description code =
     let
-      val desc = Internal.String.trim description
+      val desc = String.trim description
     in
       if desc = "" then blankDescriptionFail
       else Labeled (description, UnitTest code)
@@ -56,8 +78,8 @@ struct
           })
     else
       case duplicatedNames tests of
-        NONE => Batch tests
-      | SOME duplicates =>
+        OK _ => Batch tests
+      | ERROR duplicates =>
           let
             open Expectation
 
