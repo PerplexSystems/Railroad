@@ -57,7 +57,6 @@ sig
   val toString: Expectation -> string
 end
 
-
 structure Expectation: EXPECTATION =
 struct
   datatype InvalidReason = EmptyList | DuplicatedName | BadDescription
@@ -355,6 +354,7 @@ sig
 
   val describe: string -> test list -> test
   val test: string -> (unit -> Expectation.Expectation) -> test
+  val testTheory: string -> 'a list -> ('a -> Expectation.Expectation) -> test
   val skip: test -> test
   val focus: test -> test
   val concat: test list -> test
@@ -382,7 +382,7 @@ struct
           }
       else if List.null tests then
         failnow
-          { description = "This `describe " ^ desc ^ "` has no tests in it."
+          { description = "This `describe` " ^ desc ^ "` has no tests in it."
           , reason = Invalid EmptyList
           }
       else
@@ -418,6 +418,35 @@ struct
     in
       if desc = "" then blankDescriptionFail
       else Labeled (description, UnitTest code)
+    end
+
+  fun testTheory description theories code =
+    let
+      val desc = String.trim description
+
+      fun createTest count theory =
+        test (Int.toString count) (fn _ => (code theory))
+
+      fun accumulateTests (theory, (count, tests)) =
+        let val theoryTest = createTest count theory
+        in (count + 1, theoryTest :: tests)
+        end
+
+      val (_, tests) = List.foldl accumulateTests (1, []) theories
+    in
+      if desc = "" then
+        failnow
+          { description = "This `testTheory` has a blank description."
+          , reason = Invalid BadDescription
+          }
+      else if List.null theories then
+        failnow
+          { description =
+              "This `testTheory` " ^ desc ^ "` has no theories in it."
+          , reason = Invalid EmptyList
+          }
+      else
+        describe desc tests
     end
 
   fun skip test = Skipped test

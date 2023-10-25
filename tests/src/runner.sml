@@ -109,6 +109,16 @@ struct
                 in
                   Expect.equalFmt Int.compare Int.toString 1 actual
                 end)
+            , test "have three tests" (fn _ =>
+                let
+                  val tests = testTheory "even numbers" [2, 4, 6] (fn num =>
+                    Expect.isTrue (num mod 2 = 0))
+                  val distribution = todistribution tests
+                  val actual = List.length (#all distribution)
+                  val expected = 3
+                in
+                  Expect.equalFmt Int.compare Int.toString expected actual
+                end)
             ]
         ]
     end
