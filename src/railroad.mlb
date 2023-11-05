@@ -16,7 +16,7 @@
 
 local
     $(SML_LIB)/basis/basis.mlb
-    src/railroad.sml
+    railroad.sml
 in
     signature CONFIGURATION
     signature TEST

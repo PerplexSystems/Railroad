@@ -11,17 +11,17 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@v3
-    
+
     - name: Install Nix
       uses: DeterminateSystems/nix-installer-action@v4
-    
+
     - name: Run the Magic Nix Cache
       uses: DeterminateSystems/magic-nix-cache-action@v2
-    
-    - name: Run Tests
-      run: |
-        nix run .#test -L --impure
 
     - name: Build
       run: |
-        nix run .#build -L --impure
+        nix develop --impure -c make
+
+    - name: Run Tests
+      run: |
+        nix develop --impure -c make test

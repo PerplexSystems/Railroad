@@ -9,7 +9,7 @@
     let
       systems = [ "x86_64-linux" "x86_64-darwin" "aarch64-linux" "aarch64-darwin" ];
       forAllSystems = f: builtins.listToAttrs (map (name: { inherit name; value = f name; }) systems);
-      
+
       nixpkgsFor = forAllSystems (system: import nixpkgs {
         inherit system;
         overlays = [ addlicense.outputs.overlays.default ];
@@ -37,49 +37,6 @@
               cp README.md $out/Railroad.md
               cp -r docs $out/
             '';
-          };
-        });
-
-      apps = forAllSystems (system:
-        let
-          pkgs = nixpkgsFor.${system};
-          mlton = "${pkgs.mlton}/bin/mlton";
-          mktemp = "${pkgs.coreutils}/bin/mktemp";
-          smlfmt = "${pkgs.smlfmt}/bin/smlfmt";
-          addlicense = "${pkgs.addlicense}/bin/addlicense";
-        in
-        {
-          test = {
-            type = "app";
-            program = toString (pkgs.writeShellScript "run-tests" ''
-              output=$(${mktemp})
-              ${mlton} -output $output tests/tests.mlb && $output
-            '');
-          };
-
-          license = {
-            type = "app";
-            program = toString (pkgs.writeShellScript "apply-license" ''
-              ${addlicense} \
-                -c "Perplex Systems" \
-                -l apache \
-                $(find . -type f \( -name "*.sml" -o -name "*.smi" -o -name "*.mlb" \))
-            '');
-          };
-
-          format = {
-            type = "app";
-            program = toString (pkgs.writeShellScript "format-code" ''
-              ${smlfmt} --force **/*.mlb
-            '');
-          };
-
-          build = {
-            type = "app";
-            program = toString (pkgs.writeShellScript "build-program" ''
-              output=$(${mktemp})
-              ${mlton} -output $output sources.mlb && echo "Successfully built!"
-            '');
           };
         });
 

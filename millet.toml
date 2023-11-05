@@ -1,2 +1,2 @@
 version = 1
-workspace.root = "sources.mlb"
+workspace.root = "src/railroad.mlb"
