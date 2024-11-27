@@ -16,9 +16,9 @@
 
 signature CONFIGURATION =
 sig
-  datatype Setting = Output of TextIO.outstream
+  datatype Setting = Output of TextIO.outstream | PrintPassed of bool
 
-  type Configuration = {output: TextIO.outstream}
+  type Configuration = {output: TextIO.outstream, printPassed: bool}
 
   val fromList: Setting list -> Configuration
   val default: Configuration
@@ -26,14 +26,27 @@ end
 
 structure Configuration: CONFIGURATION =
 struct
-  datatype Setting = Output of TextIO.outstream
+  datatype Setting = Output of TextIO.outstream | PrintPassed of bool
 
-  type Configuration = {output: TextIO.outstream}
+  type Configuration = {output: TextIO.outstream, printPassed: bool}
 
-  val default = {output = TextIO.stdOut}
+  val default = {output = TextIO.stdOut, printPassed = true}
+
+  fun withOutput newOutput {output = _, printPassed} =
+    {output = newOutput, printPassed = printPassed}
+
+  fun withPrintPassed newPrintPassed {output, printPassed = _} =
+    {output = output, printPassed = newPrintPassed}
 
   fun fromList options =
-    List.foldl (fn (Output output, _) => {output = output}) default options
+    List.foldl
+      (fn (setting, config) =>
+        case setting of
+          Output newOutput =>
+            withOutput newOutput config
+        | PrintPassed newPrintPassed =>
+            withPrintPassed newPrintPassed config)
+    default options
 end
 
 signature EXPECTATION =
@@ -298,26 +311,32 @@ struct
       TextIO.output (stream, output)
     end
 
-  fun runtests stream runners =
+  fun runtests stream printPassed runners =
     let
       val runs = (List.map evalrunner runners)
       val report = runreport runs
     in
-      ( List.app (fn {result, ...} => TextIO.output (stream, result)) runs
+      ( List.app
+        (fn {result, passed} =>
+          if not passed orelse printPassed then
+            TextIO.output (stream, result)
+          else
+            ()
+        ) runs
       ; report
       )
     end
 
   fun runWithConfig options test =
     let
-      val {output} = Configuration.fromList options
+      val {output, printPassed} = Configuration.fromList options
 
       val runners = let open Configuration in fromTest test end
     in
       case runners of
         Plain rs =>
           let
-            val report = runtests output rs
+            val report = runtests output printPassed rs
             val _ = printreport output report
           in
             if (#failed report) > 0 then OS.Process.exit OS.Process.failure
@@ -325,7 +344,7 @@ struct
           end
       | Skipping rs =>
           let
-            val report = runtests output rs
+            val report = runtests output printPassed rs
             val _ = printreport output report
           in
             (* skipping a test should always fail all the tests *)
@@ -334,7 +353,7 @@ struct
 
       | Focusing rs =>
           let
-            val report = runtests output rs
+            val report = runtests output printPassed rs
             val _ = printreport output report
           in
             (* focusing a test should always fail all the tests *)
@@ -737,6 +756,12 @@ signature RAILROAD =
 sig
   structure Test: TEST
   structure Expect: EXPECT
+  structure Configuration: CONFIGURATION
 end
 
-structure Railroad = struct structure Test = Test structure Expect = Expect end
+structure Railroad =
+struct
+  structure Test = Test
+  structure Expect = Expect
+  structure Configuration = Configuration
+end
